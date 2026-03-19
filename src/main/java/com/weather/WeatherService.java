@@ -108,6 +108,7 @@ public class WeatherService {
             if (cachedWeather == null) {
                 cachedWeather = data;
             }
+            //Перевіряємо, чи змінилась температура
             if(cachedWeather.getTemperature()!= data.getTemperature()) {
                 cachedWeather = data;
                 System.out.printf("✅ Температура змінилась: з  %.1f°C на %.1f°C, %s%n",cachedWeather.getTemperature(), data.getTemperature(), data.getDescription());
