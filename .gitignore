@@ -28,3 +28,21 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Java / Maven build artifacts ###
+/target/
+/${project.build.directory}/
+*.class
+*.jar
+*.war
+*.ear
+
+### IntelliJ project files ###
+.idea/
+*.iml
+
+### Logs and temp files ###
+*.log
+*.tmp
+*.swp
+Thumbs.db
