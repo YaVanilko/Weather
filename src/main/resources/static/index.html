@@ -115,7 +115,14 @@
 <body>
 
 <div class="card">
-    <div class="city" id="city">Завантаження...</div>
+    <label for="citySelect">Оберіть місто:</label>
+    <select id="citySelect" name="city">
+        <option value="Dnipro" selected>Дніпро</option>
+        <option value="Kyiv">Київ</option>
+        <option value="Sumy">Суми</option>
+        <option value="Odesa">Одеса</option>
+    </select>
+    <div class="city" id="cityLabel">Завантаження...</div>
     <div class="weather-icon" id="icon">⏳</div>
     <div class="temperature" id="temp">--°</div>
     <div class="description" id="desc">отримую дані...</div>
@@ -169,7 +176,7 @@
     function updateUI(data) {
         if (!data || !data.city) return;
 
-        document.getElementById('city').textContent = '📍 ' + data.city;
+        document.getElementById('cityLabel').textContent = '📍 ' + data.city;
         document.getElementById('temp').textContent = Math.round(data.temperature) + '°C';
         document.getElementById('desc').textContent = data.description || '';
         document.getElementById('humidity').textContent = (data.humidity || 0) + '%';
@@ -180,7 +187,8 @@
 
     // Завантажуємо погоду з нашого Java API
     function fetchWeather() {
-        fetch('/api/weather')
+        const selectedCity = document.getElementById('citySelect').value;
+        fetch('/api/weather?city=' + encodeURIComponent(selectedCity))
             .then(response => response.json())
             .then(data => {
                 updateUI(data);
@@ -195,6 +203,9 @@
             })
             .catch(err => console.error('Помилка:', err));
     }
+
+    // При зміні міста одразу оновлюємо картку.
+    document.getElementById('citySelect').addEventListener('change', fetchWeather);
 
     // Показуємо toast-сповіщення на сторінці
     function showToast(data) {
@@ -251,7 +262,8 @@
 
     // Показуємо демо-toast при першому відкритті (через 2 секунди)
     setTimeout(() => {
-        fetch('/api/weather')
+        const selectedCity = document.getElementById('citySelect').value;
+        fetch('/api/weather?city=' + encodeURIComponent(selectedCity))
             .then(r => r.json())
             .then(data => {
                 if (data && data.city) showToast(data);
