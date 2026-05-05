@@ -46,3 +46,12 @@ bin/
 *.tmp
 *.swp
 Thumbs.db
+
+### Application configuration with secrets ###
+/src/main/resources/application.properties
+
+### Angular frontend ###
+/frontend/.angular/
+/frontend/node_modules/
+/frontend/dist/
+

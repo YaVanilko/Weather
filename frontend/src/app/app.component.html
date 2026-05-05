@@ -1,0 +1,76 @@
+<main class="page">
+  <section class="card">
+    <h1>🌤️ Weather Service</h1>
+
+    <p class="status">{{ statusMessage }}</p>
+
+    <label for="city">Оберіть місто:</label>
+    <select id="city" [(ngModel)]="selectedCity" (change)="onCityChange()">
+      @for (city of cities; track city.value) {
+        <option [value]="city.value">{{ city.label }}</option>
+      }
+    </select>
+
+    <div class="city" id="cityLabel">
+      {{ weather?.city ? '📍 ' + weather?.city : 'Завантаження...' }}
+    </div>
+
+    <div class="weather-icon" id="icon">
+      {{ weather ? getWeatherEmoji(weather.icon) : '⏳' }}
+    </div>
+
+    <div class="temperature" id="temp">
+      {{ weather ? (weather.temperature | number:'1.0-0') + '°C' : '--°' }}
+    </div>
+
+    <div class="description" id="desc">
+      @if (errorMessage) {
+        {{ errorMessage }}
+      } @else {
+        {{ weather?.description || (isLoading ? 'отримую дані...' : 'дані відсутні') }}
+      }
+    </div>
+
+    <div class="details">
+      <div class="detail-item">
+        <span class="detail-label">💧 Вологість</span>
+        <span class="detail-value" id="humidity">
+          {{ weather ? weather.humidity + '%' : '--%' }}
+        </span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">💨 Вітер</span>
+        <span class="detail-value" id="wind">
+          {{ weather ? (weather.windSpeed | number:'1.0-1') + ' м/с' : '-- м/с' }}
+        </span>
+      </div>
+    </div>
+
+    <div class="last-updated" id="updated">
+      Оновлено: {{ formatTime(weather?.lastUpdated) }}
+    </div>
+
+    <div class="actions">
+      <button class="btn secondary" type="button" (click)="manualRefresh()" [disabled]="isLoading">
+        {{ isLoading ? 'Оновлення...' : '🔄 Оновити зараз' }}
+      </button>
+
+      <button class="btn" type="button" (click)="requestNotifications()">
+        {{ notificationButtonLabel }}
+      </button>
+    </div>
+
+    @if (errorMessage) {
+      <p class="error">Спробуй оновити сторінку або перевір backend.</p>
+    }
+
+    <p class="hint">Автооновлення виконується кожні 10 хвилин.</p>
+  </section>
+
+  <div class="toast" [class.show]="toastVisible" id="toast">
+    <button class="toast-close" type="button" (click)="hideToast()">✕</button>
+    <div class="toast-title">{{ toastTitle }}</div>
+    <div class="toast-body">{{ toastBody }}</div>
+  </div>
+</main>
+
