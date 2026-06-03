@@ -9,8 +9,8 @@ import java.net.URI;
 import java.io.IOException;
 
 /**
- * Точка входу у Spring Boot додаток.
- * @EnableScheduling — вмикає підтримку @Scheduled (планувальника завдань)
+ * Entry point of the Spring Boot application.
+ * @EnableScheduling enables support for @Scheduled tasks.
  */
 @SpringBootApplication
 @EnableScheduling
@@ -18,28 +18,28 @@ public class WeatherApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(WeatherApplication.class, args);
-        System.out.println("✅ Weather Service запущено! Відкрий: http://localhost:8090");
+        System.out.println("✅ Weather Service started! Open: http://localhost:8090");
 
-        // Спробуємо відкрити браузер автоматично
+        // Try to open the browser automatically
         openBrowserIfPossible();
     }
 
     private static void openBrowserIfPossible() {
         String url = "http://localhost:8090";
 
-        // Спосіб 1: Спробуємо Desktop API
+        // Method 1: Desktop API
         if (tryDesktopBrowser(url)) {
             return;
         }
 
-        // Спосіб 2: Спробуємо системні команди
+        // Method 2: system commands
         if (trySystemCommand(url)) {
             return;
         }
 
-        // Fallback: просто виведемо посилання
-        System.out.println("📌 Браузер не вдалось відкрити автоматично.");
-        System.out.println("🌐 Будь ласка, відкрийте вручну: " + url);
+        // Fallback: print the link and ask to open manually
+        System.out.println("📌 Could not open the browser automatically.");
+        System.out.println("🌐 Please open it manually: " + url);
     }
 
     private static boolean tryDesktopBrowser(String url) {
@@ -49,12 +49,12 @@ public class WeatherApplication {
                 if (desktop.isSupported(Desktop.Action.BROWSE)) {
                     URI uri = new URI(url);
                     desktop.browse(uri);
-                    System.out.println("🌐 Браузер відкритий автоматично (Desktop API)!");
+                    System.out.println("🌐 Browser opened automatically (Desktop API)!");
                     return true;
                 }
             }
         } catch (Exception e) {
-            // Desktop API не спрацював — спробуємо системні команди
+            // Desktop API failed, try system commands next
         }
         return false;
     }
@@ -71,7 +71,7 @@ public class WeatherApplication {
                 // macOS
                 command = new String[]{"open", url};
             } else if (osName.contains("nix") || osName.contains("nux")) {
-                // Linux — спробуємо різні браузери по порядку
+                // Linux: try common browser launchers in order
                 if (isCommandAvailable("xdg-open")) {
                     command = new String[]{"xdg-open", url};
                 } else if (isCommandAvailable("firefox")) {
@@ -85,11 +85,11 @@ public class WeatherApplication {
 
             if (command != null) {
                 Runtime.getRuntime().exec(command);
-                System.out.println("🌐 Браузер відкритий автоматично (системна команда)!");
+                System.out.println("🌐 Browser opened automatically (system command)!");
                 return true;
             }
         } catch (IOException e) {
-            // Системна команда також не спрацювала
+            // System command also failed
         }
         return false;
     }

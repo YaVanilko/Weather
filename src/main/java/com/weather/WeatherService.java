@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Сервіс для отримання погоди з OpenWeatherMap API.
- * {@code @Service} — каже Spring, що це "сервісний бін" (компонент бізнес-логіки).
- * Spring автоматично створить об'єкт цього класу при запуску.
+ * Service for fetching weather data from the OpenWeatherMap API.
+ * {@code @Service} tells Spring this is a service bean (business logic component).
+ * Spring automatically creates an instance of this class on startup.
  */
 @Service
 public class WeatherService {
@@ -24,7 +24,7 @@ public class WeatherService {
     private static final Logger log = LoggerFactory.getLogger(WeatherService.class);
     private static final Logger auditLog = LoggerFactory.getLogger("com.weather.audit");
 
-    // @Value — зчитує значення з application.properties
+    // @Value reads values from application.properties
     @Value("${weather.api.key}")
     private String apiKey;
 
@@ -34,15 +34,15 @@ public class WeatherService {
     @Value("${weather.units}")
     private String units;
 
-    // RestTemplate — вбудований клієнт Spring для HTTP запитів
+    // RestTemplate is Spring's built-in HTTP client
     private final RestTemplate restTemplate = new RestTemplate();
 
-    // Зберігаємо останні дані про погоду в пам'яті
+    // Keep the latest weather data in memory
     private WeatherData cachedWeather;
 
     /**
-     * {@code @PostConstruct} — виконується ОДИН РАЗ одразу після старту додатку.
-     * Завантажуємо погоду відразу, не чекаючи першого інтервалу.
+     * {@code @PostConstruct} runs ONCE right after application startup.
+     * It fetches weather immediately instead of waiting for the first schedule tick.
      */
     @PostConstruct
     public void init() {
@@ -50,8 +50,8 @@ public class WeatherService {
     }
 
     /**
-     * {@code @Scheduled(fixedRate = 600_000)} — виконується кожні 600 000 мс = 10 хвилин.
-     * Spring автоматично викликає цей метод за розкладом.
+     * {@code @Scheduled(fixedRate = 600_000)} runs every 600,000 ms = 10 minutes.
+     * Spring calls this method automatically by schedule.
      */
     @Scheduled(fixedRate = 600_000)
     public void fetchWeather() {
@@ -60,11 +60,11 @@ public class WeatherService {
             WeatherData previousWeather = cachedWeather;
             cachedWeather = defaultCityData;
 
-            // Друкуємо зміну температури лише коли вона дійсно змінилась
+            // Log temperature change only when the value actually changed
             if (previousWeather != null
                 && Double.compare(previousWeather.getTemperature(), defaultCityData.getTemperature()) != 0) {
                 log.info(
-                    "Температура змінилась: з {}°C на {}°C, {}",
+                    "Temperature changed: from {}°C to {}°C, {}",
                     String.format("%.1f", previousWeather.getTemperature()),
                     String.format("%.1f", defaultCityData.getTemperature()),
                     defaultCityData.getDescription()
@@ -74,8 +74,8 @@ public class WeatherService {
     }
 
     /**
-     * Повертає погоду для міста із запиту.
-     * Якщо city не передано, повертаємо кеш (місто за замовчуванням).
+     * Returns weather for the requested city.
+     * If city is not provided, returns the cache (default city).
      */
     public WeatherData getWeatherByCity(String requestedCity) {
         String cityToUse = normalizeCity(requestedCity);
@@ -94,7 +94,7 @@ public class WeatherService {
     }
 
     /**
-     * Повертає останні збережені дані про погоду (місто за замовчуванням).
+     * Returns the latest cached weather data (default city).
      */
     public WeatherData getCachedWeather() {
         return cachedWeather;
@@ -103,9 +103,9 @@ public class WeatherService {
     private WeatherData fetchWeatherFromApi(String cityName) {
         String requestUrl = null;
         try {
-            // Перевіряємо, чи задано API ключ
+            // Validate API key presence
             if (apiKey == null || "YOUR_API_KEY_HERE".equals(apiKey) || apiKey.trim().isEmpty()) {
-                log.warn("API ключ не задано! Повертаю демо-дані для міста: {}", cityName);
+                log.warn("API key is not set! Returning demo data for city: {}", cityName);
                 WeatherData demo = createDemoWeather(cityName);
                 auditLog.info("OPENWEATHER DEMO city={} temp={}", demo.getCity(), String.format("%.1f", demo.getTemperature()));
                 return demo;
@@ -119,18 +119,18 @@ public class WeatherService {
             String apiCity = toApiCity(normalizedCity);
             String encodedCity = URLEncoder.encode(apiCity, "UTF-8");
             String url = String.format(
-                "https://api.openweathermap.org/data/2.5/weather?q=%s&units=%s&appid=%s&lang=ua",
+                "https://api.openweathermap.org/data/2.5/weather?q=%s&units=%s&appid=%s&lang=en",
                 encodedCity, units, apiKey
             );
 
             requestUrl = url;
-            log.info("Отримую погоду для міста: {}", normalizedCity);
+            log.info("Fetching weather for city: {}", normalizedCity);
             auditLog.info("OPENWEATHER REQUEST url={}", sanitizeUrl(url));
 
             @SuppressWarnings("unchecked")
             Map<String, Object> response = restTemplate.getForObject(url, Map.class);
             if (response == null) {
-                log.error("Порожня відповідь від API для міста: {}", normalizedCity);
+                log.error("Empty API response for city: {}", normalizedCity);
                 auditLog.warn("OPENWEATHER RESPONSE url={} status=empty", sanitizeUrl(requestUrl));
                 return null;
             }
@@ -145,13 +145,13 @@ public class WeatherService {
             @SuppressWarnings("unchecked")
             Map<String, Object> main = (Map<String, Object>) response.get("main");
             if (main == null) {
-                log.error("Відповідь API не містить блоку 'main' для міста: {}", normalizedCity);
+                log.error("API response does not contain 'main' block for city: {}", normalizedCity);
                 return null;
             }
             Object tempObj = main.get("temp");
             Object humidityObj = main.get("humidity");
             if (!(tempObj instanceof Number) || !(humidityObj instanceof Number)) {
-                log.error("Некоректні поля 'temp'/'humidity' для міста: {}", normalizedCity);
+                log.error("Invalid 'temp'/'humidity' fields for city: {}", normalizedCity);
                 return null;
             }
             data.setTemperature(((Number) tempObj).doubleValue());
@@ -160,12 +160,12 @@ public class WeatherService {
             @SuppressWarnings("unchecked")
             Map<String, Object> wind = (Map<String, Object>) response.get("wind");
             if (wind == null) {
-                log.error("Відповідь API не містить блоку 'wind' для міста: {}", normalizedCity);
+                log.error("API response does not contain 'wind' block for city: {}", normalizedCity);
                 return null;
             }
             Object windSpeedObj = wind.get("speed");
             if (!(windSpeedObj instanceof Number)) {
-                log.error("Некоректне поле 'speed' для міста: {}", normalizedCity);
+                log.error("Invalid 'speed' field for city: {}", normalizedCity);
                 return null;
             }
             data.setWindSpeed(((Number) windSpeedObj).doubleValue());
@@ -190,7 +190,7 @@ public class WeatherService {
             );
             return data;
         } catch (HttpStatusCodeException e) {
-            log.error("Помилка HTTP при отриманні погоди для міста: {}", cityName, e);
+            log.error("HTTP error while fetching weather for city: {}", cityName, e);
             auditLog.error(
                 "OPENWEATHER ERROR url={} httpStatus={} body={}",
                 sanitizeUrl(requestUrl),
@@ -199,7 +199,7 @@ public class WeatherService {
             );
             return null;
         } catch (Exception e) {
-            log.error("Помилка отримання погоди для міста: {}", cityName, e);
+            log.error("Unexpected error while fetching weather for city: {}", cityName, e);
             auditLog.error(
                 "OPENWEATHER ERROR url={} type={} message={}",
                 sanitizeUrl(requestUrl),
@@ -242,13 +242,13 @@ public class WeatherService {
     }
 
     /**
-     * Демо-дані для роботи без API ключа.
+     * Demo data for running without an API key.
      */
     private WeatherData createDemoWeather(String cityName) {
         WeatherData demo = new WeatherData();
         demo.setCity(cityName);
         demo.setTemperature(18.5);
-        demo.setDescription("демо режим — ясно");
+        demo.setDescription("demo mode - clear sky");
         demo.setIcon("01d");
         demo.setHumidity(60);
         demo.setWindSpeed(3.5);

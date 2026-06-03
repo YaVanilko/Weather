@@ -1,44 +1,45 @@
 # Weather Service
 
-Простий навчальний веб-сервіс на **Java + Spring Boot + Angular**, який отримує погоду через дані з API та показує їх у браузері.
+A simple educational web service built with **Java + Spring Boot + Angular** that fetches weather data from an API and shows it in the browser.
 
-## Можливості
+## Features
 
-- отримання поточної погоди для обраного міста;
-- кешування останніх погодних даних на сервері;
-- автооновлення даних за розкладом (кожні 10 хвилин);
-- REST API для фронтенду;
-- веб-сторінка зі сповіщеннями (toast / браузерні notifications).
+- fetch current weather for a selected city;
+- cache the latest weather data on the server;
+- auto-refresh data on a schedule (every 10 minutes);
+- REST API for the frontend;
+- web page with notifications (toast / browser notifications).
 
-## Технології
+## Technologies
 
 - **Backend**: Java 21, Spring Boot 3.3.0, Maven
 - **Frontend**: Angular 19, TypeScript, RxJS
 - **API**: OpenWeather API
 
-## Структура проєкту
+## Project Structure
 
-- `src/main/java/com/weather/` — Spring Boot бекенд
-  - `WeatherApplication.java` — точка входу
-  - `WeatherService.java` — логіка отримання і кешування
-  - `WeatherController.java` — REST API (`/api/...`)
-  - `WeatherData.java` — модель погодних даних
-- `frontend/` — Angular-застосунок
-  - `src/app/` — Angular компоненти, сервіси
-  - `angular.json` — конфіг Angular
-  - `proxy.conf.json` — dev proxy до бекенду
-- `src/main/resources/application.properties` — конфігурація спрінга
+- `src/main/java/com/weather/` - Spring Boot backend
+  - `WeatherApplication.java` - entry point
+  - `WeatherService.java` - fetching and caching logic
+  - `WeatherController.java` - REST API (`/api/...`)
+  - `WeatherData.java` - weather data model
+- `frontend/` - Angular application
+  - `src/app/` - Angular components and services
+  - `angular.json` - Angular config
+  - `proxy.conf.json` - dev proxy to backend
+- `src/main/resources/application.properties` - Spring configuration
 
-## Передумови
+## Documentation Map
 
-- встановлений **JDK 21**;
-- налаштований **Project SDK в IntelliJ**;
-- встановлений **Node.js 20+** і **npm**;
-- доступ до інтернету для запитів до **OpenWeather API**.
+- `docs/PROJECT_CONTEXT.md` - quick project context, architecture, key files, and run flow.
+- `docs/STATUS.md` - current state, decisions, risks, and next tasks.
+- `README.md` - detailed run instructions and API reference.
 
-## Налаштування
+For a new chat/session, first share `docs/PROJECT_CONTEXT.md` and `docs/STATUS.md`.
 
-Відкрий `src/main/resources/application.properties` і вкажи свої значення:
+## Setup
+
+Open `src/main/resources/application.properties` and set your values:
 
 ```properties
 weather.city=Dnipro
@@ -47,11 +48,11 @@ weather.units=metric
 server.port=8090
 ```
 
-> ⚠️ Не коміть реальний API-ключ у Git. Це даних у prod середовищу треба зберігати в безпечних змінних.
+> ⚠️ Never commit a real API key to Git. In production, store secrets in secure environment variables.
 
-## Запуск (всё в одному jar на порту 8090)
+## Run (all-in-one JAR on port 8090)
 
-### Варіант 1: Готовий jar-файл
+### Option 1: Packaged JAR
 
 ```powershell
 cd D:\JProjects\weather
@@ -59,9 +60,9 @@ mvn clean package
 java -jar target\weather-service-1.0.0.jar
 ```
 
-Потім відкривай у браузері: **`http://localhost:8090`**
+Then open: **`http://localhost:8090`**
 
-### Варіант 2: Maven spring-boot:run
+### Option 2: Maven `spring-boot:run`
 
 ```powershell
 cd D:\JProjects\weather
@@ -69,25 +70,25 @@ mvn clean package
 mvn spring-boot:run
 ```
 
-Потім відкривай у браузері: **`http://localhost:8090`**
+Then open: **`http://localhost:8090`**
 
-### Перевірка:
+### Verification
 
-- UI: `http://localhost:8090` — Angular интерфейс
-- API Статус: `http://localhost:8090/api/status`
-- API Погода: `http://localhost:8090/api/weather`
+- UI: `http://localhost:8090` - Angular interface
+- API status: `http://localhost:8090/api/status`
+- API weather: `http://localhost:8090/api/weather`
 
-> 💡 Maven автоматично збирає Angular UI, встановлює залежності і упаковує все в один jar-файл.
+> 💡 Maven automatically builds the Angular UI, installs dependencies, and packages everything into one JAR.
 
 ---
 
-## Розробка — запуск Angular окремо
+## Development - run Angular separately
 
-Якщо хочеш розробляти фронтенд окремо (швидша итерація):
+If you want to work on frontend separately (faster iteration):
 
-### Запуск обох сервісів паралельно:
+### Run both services in parallel
 
-**Термінал 1 — Spring Boot на 8090:**
+**Terminal 1 - Spring Boot on 8090:**
 
 ```powershell
 cd D:\JProjects\weather
@@ -95,7 +96,7 @@ mvn clean package
 mvn spring-boot:run
 ```
 
-**Термінал 2 — Angular dev на 4200:**
+**Terminal 2 - Angular dev server on 4200:**
 
 ```powershell
 cd D:\JProjects\weather\frontend
@@ -103,9 +104,9 @@ npm install
 npm start
 ```
 
-Потім відкривай у браузері: **`http://localhost:4200`**
+Then open: **`http://localhost:4200`**
 
-> 📌 Angular dev-сервер звертається до бекенду через proxy (`frontend/proxy.conf.json`), тому CORS не потрібен.
+> 📌 Angular dev server calls backend through proxy (`frontend/proxy.conf.json`), so CORS setup is not required.
 
 ---
 
@@ -113,39 +114,39 @@ npm start
 
 ### `GET /api/status`
 
-Перевірка, що сервіс працює.
+Check that the service is running.
 
-**Приклад запиту:**
+**Request example:**
 ```bash
 curl http://localhost:8090/api/status
 ```
 
-**Приклад відповіді:**
+**Response example:**
 ```json
 {
   "status": "running",
-  "message": "Weather Service працює! ✅"
+  "message": "Weather Service is running! ✅"
 }
 ```
 
 ### `GET /api/weather`
 
-Повертає останні кешовані погодні дані.
+Returns the latest cached weather data.
 
-**Параметри:**
-- `city` (необов'язковий) — назва міста (за замовченням: значення з `application.properties`)
+**Parameters:**
+- `city` (optional) - city name (default: value from `application.properties`)
 
-**Приклад запиту:**
+**Request example:**
 ```bash
 curl "http://localhost:8090/api/weather?city=Kyiv"
 ```
 
-**Приклад відповіді:**
+**Response example:**
 ```json
 {
   "city": "Dnipro",
   "temperature": 18.5,
-  "description": "ясно",
+  "description": "clear sky",
   "icon": "01d",
   "humidity": 60,
   "windSpeed": 3.5,
@@ -155,55 +156,11 @@ curl "http://localhost:8090/api/weather?city=Kyiv"
 
 ---
 
-## Типові помилки
+## Development
 
-### 401 Unauthorized / Invalid API key
-- перевір, що API ключ у `application.properties` коректний;
-- згенеруй новий ключ на https://openweathermap.org/;
-- дочекайся його активації (зазвичай 5–10 хвилин);
-- перезапусти застосунок.
+Code is split into two parts:
 
-### JDK isn't specified for module 'weather-service'
-- В IntelliJ: `File → Project Structure → Project SDK` → обрати JDK 21;
-- або для модуля: `Project Structure → Modules → weather-service → Dependencies → Module SDK`.
+- **Backend** (`src/main/java/`) - Java + Spring Boot, handles requests to OpenWeather API
+- **Frontend** (`frontend/src/`) - Angular + TypeScript, UI for city selection and weather display
 
-### Could not find or load main class com.weather.WeatherApplication
-- онови Maven проєкт: `File → Reload All Maven Projects`;
-- перевір Run Configuration (Main class: `com.weather.WeatherApplication`).
-
-### npm: command not found
-- встанови Node.js за посиланням https://nodejs.org/
-- перезавантаж PowerShell або IDE.
-
----
-
-## Розробка
-
-Код розподілений між двома частинами:
-
-- **Backend** (`src/main/java/`) — Java + Spring Boot, обробляє запити до OpenWeather API
-- **Frontend** (`frontend/src/`) — Angular + TypeScript, UI для вибору міста і відображення погоди
-
-### Запуск тестів
-
-```powershell
-cd D:\JProjects\weather\frontend
-npm test -- --watch=false --browsers=ChromeHeadless
-```
-
----
-
-## Публікація
-
-Вся система упакована в один jar-файл:
-```powershell
-mvn clean package
-java -jar target\weather-service-1.0.0.jar
-```
-
-Один jar-файл містить:
-- Spring Boot приложение (backend)
-- Angular UI (в `static/` ресурсах)
-
-Ідеально для containerization (Docker, K8s) або простого деплою на сервер.
 

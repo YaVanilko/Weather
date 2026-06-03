@@ -1,23 +1,23 @@
 package com.weather;
 
 /**
- * Простий клас-модель (POJO) для зберігання даних про погоду.
- * Це те, що буде повертати наш REST API у форматі JSON.
+ * Simple model class (POJO) for storing weather data.
+ * This is what the REST API returns as JSON.
  */
 public class WeatherData {
 
-    private String city;          // Назва міста
-    private double temperature;   // Температура
-    private String description;   // Опис (наприклад, "clear sky")
-    private String icon;          // Код іконки від OpenWeatherMap
-    private int humidity;         // Вологість у відсотках
-    private double windSpeed;     // Швидкість вітру м/с
-    private long lastUpdated;     // Unix timestamp останнього оновлення
+    private String city;          // City name
+    private double temperature;   // Temperature
+    private String description;   // Description (for example, "clear sky")
+    private String icon;          // OpenWeatherMap icon code
+    private int humidity;         // Humidity percentage
+    private double windSpeed;     // Wind speed in m/s
+    private long lastUpdated;     // Unix timestamp of the last update
 
-    // --- Конструктор ---
+    // --- Constructor ---
     public WeatherData() {}
 
-    // --- Getters та Setters (Spring використовує їх для перетворення в JSON) ---
+    // --- Getters and Setters (Spring uses them for JSON serialization) ---
 
     public String getCity() { return city; }
     public void setCity(String city) { this.city = city; }
@@ -40,4 +40,3 @@ public class WeatherData {
     public long getLastUpdated() { return lastUpdated; }
     public void setLastUpdated(long lastUpdated) { this.lastUpdated = lastUpdated; }
 }
-

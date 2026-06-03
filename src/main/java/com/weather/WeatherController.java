@@ -11,11 +11,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * REST Контролер — обробляє HTTP запити від браузера.
+ * REST controller that handles HTTP requests from the browser.
  *
- * @RestController — каже Spring, що цей клас відповідає на HTTP запити
- *                   і повертає JSON (не HTML сторінки).
- * @RequestMapping("/api") — всі ендпоінти цього контролера починаються з /api
+ * @RestController tells Spring this class handles HTTP requests
+ *                 and returns JSON (not HTML pages).
+ * @RequestMapping("/api") means all endpoints in this controller start with /api
  */
 @RestController
 @RequestMapping("/api")
@@ -23,7 +23,7 @@ public class WeatherController {
 
     private static final Logger auditLog = LoggerFactory.getLogger("com.weather.audit");
 
-    // Spring автоматично "вставляє" WeatherService через конструктор (Dependency Injection)
+    // Spring injects WeatherService through constructor dependency injection
     private final WeatherService weatherService;
 
     public WeatherController(WeatherService weatherService) {
@@ -32,8 +32,8 @@ public class WeatherController {
 
     /**
      * GET /api/weather
-     * Повертає поточні дані про погоду у форматі JSON.
-     * Параметр city (необов'язковий) дозволяє запитати погоду для конкретного міста.
+     * Returns current weather data as JSON.
+     * The optional city parameter allows requesting weather for a specific city.
      */
     @GetMapping("/weather")
     public WeatherData getWeather(@RequestParam(name = "city", required = false) String city) {
@@ -42,7 +42,7 @@ public class WeatherController {
         WeatherData data = weatherService.getWeatherByCity(city);
         if (data == null) {
             auditLog.warn("RESPONSE /api/weather city={} status=empty", city == null ? "<default>" : city);
-            // Якщо дані ще не завантажились — повертаємо порожній об'єкт
+            // If data is not loaded yet, return an empty object
             return new WeatherData();
         }
 
@@ -58,13 +58,13 @@ public class WeatherController {
 
     /**
      * GET /api/status
-     * Простий ендпоінт для перевірки, що сервер живий.
+     * Simple endpoint to verify that the server is alive.
      */
     @GetMapping("/status")
     public Map<String, String> getStatus() {
         Map<String, String> status = new HashMap<>();
         status.put("status", "running");
-        status.put("message", "Weather Service працює! ✅");
+        status.put("message", "Weather Service is running! ✅");
         return status;
     }
 
